@@ -24,7 +24,7 @@ public class Expense {
     private String title;
 
     @NotNull(message = "Amount is required")
-    @DecimalMin(value = "0.01", message = "Amount must be than zero")
+    @DecimalMin(value = "0.01", message = "Amount must be greater than zero")
     private BigDecimal amount;
 
     @NotNull(message = "Category is required")
