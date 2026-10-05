@@ -2,6 +2,7 @@ package com.example.expensetracker.controller;
 
 import com.example.expensetracker.model.Expense;
 import com.example.expensetracker.servise.ExpenseService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,14 +28,14 @@ public class ExpenseController {
     }
 
     @PostMapping
-    public Expense createExpense(@RequestBody Expense expense) {
+    public Expense createExpense(@Valid @RequestBody Expense expense) {
         return expenseService.createExpense(expense);
     }
 
     @PutMapping("/{id}")
     public Expense updateExpense(
             @PathVariable Long id,
-            @RequestBody Expense expense
+            @Valid @RequestBody Expense expense
     ) {
         return expenseService.updateExpense(id, expense);
     }
