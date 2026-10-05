@@ -6,6 +6,7 @@ import com.example.expensetracker.servise.ExpenseService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -62,5 +63,10 @@ public class ExpenseController {
     @DeleteMapping("/{id}")
     public void deleteExpense(@PathVariable Long id) {
         expenseService.deleteExpense(id);
+    }
+
+    @GetMapping("/total")
+    public BigDecimal getTotalExpenses() {
+        return expenseService.getTotalExpenses();
     }
 }

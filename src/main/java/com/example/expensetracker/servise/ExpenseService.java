@@ -5,6 +5,7 @@ import com.example.expensetracker.model.ExpenseCategory;
 import com.example.expensetracker.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -62,5 +63,12 @@ public class ExpenseService {
                 from,
                 to
         );
+    }
+
+    public BigDecimal getTotalExpenses() {
+        return expenseRepository.findAll()
+                .stream()
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
