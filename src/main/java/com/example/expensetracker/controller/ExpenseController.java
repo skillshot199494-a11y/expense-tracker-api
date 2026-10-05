@@ -1,10 +1,12 @@
 package com.example.expensetracker.controller;
 
 import com.example.expensetracker.model.Expense;
+import com.example.expensetracker.model.ExpenseCategory;
 import com.example.expensetracker.servise.ExpenseService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -18,7 +20,24 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public List<Expense> getAllExpenses() {
+    public List<Expense> getAllExpenses(
+            @RequestParam(required = false)ExpenseCategory category,
+            @RequestParam(required = false)LocalDate from,
+            @RequestParam(required = false)LocalDate to
+            ) {
+
+        if (category != null && from != null && to != null) {
+            return expenseService.getExpensesByCategoryAndDateRange(category, from, to);
+        }
+
+        if (category != null) {
+            return expenseService.getExpensesByCategory(category);
+        }
+
+        if (from != null && to != null) {
+            return expenseService.getExpensesByDateRange(from, to);
+        }
+
         return expenseService.getAllExpenses();
     }
 
