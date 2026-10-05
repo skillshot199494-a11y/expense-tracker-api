@@ -3,6 +3,8 @@ package com.example.expensetracker.servise;
 import com.example.expensetracker.model.Expense;
 import com.example.expensetracker.model.ExpenseCategory;
 import com.example.expensetracker.repository.ExpenseRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -70,5 +72,9 @@ public class ExpenseService {
                 .stream()
                 .map(Expense::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public Page<Expense> getExpenses(Pageable pageable) {
+        return expenseRepository.findAll(pageable);
     }
 }

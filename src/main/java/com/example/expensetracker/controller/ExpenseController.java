@@ -4,6 +4,10 @@ import com.example.expensetracker.model.Expense;
 import com.example.expensetracker.model.ExpenseCategory;
 import com.example.expensetracker.servise.ExpenseService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -68,5 +72,23 @@ public class ExpenseController {
     @GetMapping("/total")
     public BigDecimal getTotalExpenses() {
         return expenseService.getTotalExpenses();
+    }
+
+    @GetMapping("/page")
+    public Page<Expense> getExpenses(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "expenseData") String sort,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        Sort.Direction sortDirection = Sort.Direction.fromString(direction.trim());
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(sortDirection, sort)
+        );
+
+        return expenseService.getExpenses(pageable);
     }
 }
