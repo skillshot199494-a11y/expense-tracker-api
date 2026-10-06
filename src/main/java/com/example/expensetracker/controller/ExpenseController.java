@@ -1,6 +1,7 @@
 package com.example.expensetracker.controller;
 
-import com.example.expensetracker.model.Expense;
+import com.example.expensetracker.dto.ExpenseRequest;
+import com.example.expensetracker.dto.ExpenseResponse;
 import com.example.expensetracker.model.ExpenseCategory;
 import com.example.expensetracker.servise.ExpenseService;
 import jakarta.validation.Valid;
@@ -25,7 +26,7 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public List<Expense> getAllExpenses(
+    public List<ExpenseResponse> getAllExpenses(
             @RequestParam(required = false)ExpenseCategory category,
             @RequestParam(required = false)LocalDate from,
             @RequestParam(required = false)LocalDate to
@@ -47,21 +48,21 @@ public class ExpenseController {
     }
 
     @GetMapping("/{id}")
-    public Expense getExpenseById(@PathVariable Long id) {
+    public ExpenseResponse getExpenseById(@PathVariable Long id) {
         return expenseService.getExpenseById(id);
     }
 
     @PostMapping
-    public Expense createExpense(@Valid @RequestBody Expense expense) {
-        return expenseService.createExpense(expense);
+    public ExpenseResponse createExpense(@Valid @RequestBody ExpenseRequest request) {
+        return expenseService.createExpense(request);
     }
 
     @PutMapping("/{id}")
-    public Expense updateExpense(
+    public ExpenseResponse updateExpense(
             @PathVariable Long id,
-            @Valid @RequestBody Expense expense
+            @Valid @RequestBody ExpenseRequest request
     ) {
-        return expenseService.updateExpense(id, expense);
+        return expenseService.updateExpense(id, request);
     }
 
     @DeleteMapping("/{id}")
@@ -75,7 +76,7 @@ public class ExpenseController {
     }
 
     @GetMapping("/page")
-    public Page<Expense> getExpenses(
+    public Page<ExpenseResponse> getExpenses(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "expenseData") String sort,

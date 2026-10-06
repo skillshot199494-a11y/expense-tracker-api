@@ -1,5 +1,7 @@
 package com.example.expensetracker.servise;
 
+import com.example.expensetracker.dto.ExpenseRequest;
+import com.example.expensetracker.dto.ExpenseResponse;
 import com.example.expensetracker.model.Expense;
 import com.example.expensetracker.model.ExpenseCategory;
 import com.example.expensetracker.repository.ExpenseRepository;
@@ -20,51 +22,69 @@ public class ExpenseService {
         this.expenseRepository = expenseRepository;
     }
 
-    public List<Expense> getAllExpenses() {
-        return expenseRepository.findAll();
+    public List<ExpenseResponse> getAllExpenses() {
+        return expenseRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public Expense getExpenseById(Long id) {
+    private Expense getExpenseEntityById(Long id) {
         return expenseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Expense not found"));
+                        .orElseThrow(() -> new RuntimeException("Expense not found"));
     }
 
-    public Expense createExpense(Expense expense) {
-        return expenseRepository.save(expense);
+    public ExpenseResponse getExpenseById(Long id) {
+        return toResponse(getExpenseEntityById(id));
     }
 
-    public Expense updateExpense(Long id, Expense expense) {
-        Expense existingExpense = getExpenseById(id);
+    public ExpenseResponse createExpense(ExpenseRequest request) {
+        Expense expense = toEntity(request);
+        Expense savedExpense = expenseRepository.save(expense);
 
-        existingExpense.setTitle(expense.getTitle());
-        existingExpense.setAmount(expense.getAmount());
-        existingExpense.setCategory(expense.getCategory());
-        existingExpense.setExpenseDate(expense.getExpenseDate());
+        return toResponse(savedExpense);
+    }
 
-        return expenseRepository.save(existingExpense);
+    public ExpenseResponse updateExpense(Long id, ExpenseRequest request) {
+        Expense existingExpense = getExpenseEntityById(id);
+
+        existingExpense.setTitle(request.getTitle());
+        existingExpense.setAmount(request.getAmount());
+        existingExpense.setCategory(request.getCategory());
+        existingExpense.setExpenseDate(request.getExpenseDate());
+
+        Expense updatedExpense = expenseRepository.save(existingExpense);
+
+        return toResponse(updatedExpense);
     }
 
     public void deleteExpense(Long id) {
         expenseRepository.deleteById(id);
     }
 
-    public List<Expense> getExpensesByCategory(ExpenseCategory category) {
-        return expenseRepository.findByCategory(category);
+    public List<ExpenseResponse> getExpensesByCategory(ExpenseCategory category) {
+        return expenseRepository.findByCategory(category)
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public List<Expense> getExpensesByDateRange(LocalDate from, LocalDate to) {
-        return expenseRepository.findByExpenseDateBetween(from, to);
+    public List<ExpenseResponse> getExpensesByDateRange(LocalDate from, LocalDate to) {
+        return expenseRepository.findByExpenseDateBetween(from, to)
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public List<Expense> getExpensesByCategoryAndDateRange(
+    public List<ExpenseResponse> getExpensesByCategoryAndDateRange(
             ExpenseCategory category,
             LocalDate from,
             LocalDate to
     ) {
-        return expenseRepository.findByCategoryAndExpenseDateBetween(category,
-                from,
-                to
-        );
+        return expenseRepository.findByCategoryAndExpenseDateBetween(category, from, to)
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public BigDecimal getTotalExpenses() {
@@ -74,7 +94,33 @@ public class ExpenseService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public Page<Expense> getExpenses(Pageable pageable) {
-        return expenseRepository.findAll(pageable);
+    public Page<ExpenseResponse> getExpenses(Pageable pageable) {
+        return expenseRepository.findAll(pageable)
+                .map(this::toResponse);
+    }
+
+    private ExpenseResponse toResponse(Expense expense) {
+        ExpenseResponse response = new ExpenseResponse();
+
+        response.setId(expense.getId());
+        response.setTitle(expense.getTitle());
+        response.setAmount(expense.getAmount());
+        response.setCategory(expense.getCategory());
+        response.setExpenseDate(expense.getExpenseDate());
+        response.setCreatedAt(expense.getCreatedAt());
+        response.setUpdatedAt(expense.getUpdatedAt());
+
+        return response;
+    }
+
+    private Expense toEntity(ExpenseRequest request) {
+        Expense expense = new Expense();
+
+        expense.setTitle(request.getTitle());
+        expense.setAmount(request.getAmount());
+        expense.setCategory(request.getCategory());
+        expense.setExpenseDate(request.getExpenseDate());
+
+        return expense;
     }
 }
